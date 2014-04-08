@@ -6,8 +6,10 @@ var Rx          = require('rx'),
     TodoActions = require('./actions/todoActions'),
     MainView    = require('./views/mainView.jsx');
 
+
 var todoStore = new TodoStore('react-todos');
 
+//register our actions against our store updates stream
 TodoActions.register(todoStore.updates);
 
 React.renderComponent(

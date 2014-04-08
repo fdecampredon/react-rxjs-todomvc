@@ -4,6 +4,10 @@ var Rx      = require('rx'),
     assign  = require('../utils/assign'),
     uuid    = require('../utils/uuid');
 
+/**
+ * A set of actions that will be exposed into views
+ * Thoses actions will trigger model update
+ */
 var TodoActions = {
   create: new Rx.Subject(),
   updateTitle: new Rx.Subject(),
@@ -13,6 +17,11 @@ var TodoActions = {
   clearCompleted: new Rx.Subject(),
 };
 
+/**
+ * Register our actions against an updates stream
+ * each one of our actions will push operation to apply on the model
+ * into the stream.
+ */
 TodoActions.register = function (updates) {
     this.create
         .map(function (title) {
