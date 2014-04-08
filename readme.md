@@ -10,7 +10,7 @@ Simply start a static server on this project folder.
 
 You have to install [Browserify](http://browserify.org/) then simply run these command :
 ```
-npm instal
+npm install
 ```
 this will install all the dependencies and bundle the project sources files.
 
