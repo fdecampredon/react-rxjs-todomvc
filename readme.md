@@ -37,12 +37,12 @@ In this implementation state and events handlers are managed in a 'reactive' way
 
 
 ```
-TodoStore.todos --------> React Components -- +
-.updates                                      |
-Ʌ                                             |
-|                                             |
-|                                             V
-+-- (push operations) <------------------ TodoActions
+TodoStore.todos --------------> React Components ---- (push value) ---> TodoActions-- + 
+Ʌ                                                                                     |
+|                                                                                     |
+|                                                                                     |
+|                                                                                     |
++--(apply operation on the todos list) ---TodoStore.updates  <--- (push operations) --+
 ```
 
                                 
