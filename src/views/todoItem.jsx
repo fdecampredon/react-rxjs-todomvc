@@ -6,8 +6,8 @@
 'use strict';
 
 var React       = require('react/addons'),
-    Rx          = require('rx'),
     RxMixin     = require('../utils/rxMixin'),
+    EventHandler = require('../utils/eventHandler'),
     TodoActions = require('../actions/TodoActions');
 
 var ESCAPE_KEY = 27;
@@ -24,18 +24,18 @@ var TodoItem = React.createClass({
         };
     },
     
-    getSubjects: function () {
-        var toggleClick = new Rx.Subject();
+    componentWillMount: function () {
+        var toggleClick = EventHandler.create();
         toggleClick
             .map(this.getTodo)
             .subscribe(TodoActions.toggle);
         
-        var destroyButtonClick = new Rx.Subject();
+        var destroyButtonClick = EventHandler.create();
         destroyButtonClick
             .map(this.getTodo)
             .subscribe(TodoActions.destroy);
         
-        var labelDoubleClick = new Rx.Subject();
+        var labelDoubleClick = EventHandler.create();
         labelDoubleClick
             .map(function () { 
                 return {
@@ -44,7 +44,7 @@ var TodoItem = React.createClass({
             })
             .subscribe(this.stateStream);
         
-        var editFieldKeyDown = new Rx.Subject();
+        var editFieldKeyDown = EventHandler.create();
         editFieldKeyDown
             .filter(function (event) {
                 return event.keyCode === ESCAPE_KEY;
@@ -63,12 +63,12 @@ var TodoItem = React.createClass({
             })
             .subscribe(this.submit);
         
-        var editFieldBlur  = new Rx.Subject();
+        var editFieldBlur  = EventHandler.create();
         editFieldBlur
             .subscribe(this.submit);
         
         
-        var editFieldChange = new Rx.Subject();
+        var editFieldChange = EventHandler.create();
         editFieldChange
             .map(function (e) {
                 return {
@@ -77,7 +77,7 @@ var TodoItem = React.createClass({
             })
             .subscribe(this.stateStream);
         
-        return {
+        this.handlers = {
             toggleClick: toggleClick,
             destroyButtonClick: destroyButtonClick,
             labelDoubleClick : labelDoubleClick,

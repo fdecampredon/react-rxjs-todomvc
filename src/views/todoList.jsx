@@ -7,24 +7,24 @@
 'use strict';
 
 var React           = require('react/addons'),
-    Rx              = require('rx'),
+    EventHandler = require('../utils/eventHandler'),
     RxMixin         = require('../utils/rxMixin'),
     TodoActions     = require('../actions/TodoActions'),
     TodoItem        = require('./todoItem.jsx');
 
 
-var TodoApp = React.createClass({
+var TodoList = React.createClass({
     mixins: [RxMixin],
     
-    getSubjects: function () {
-        var toggleAllChange = new Rx.Subject();
+    componentWillMount: function () {
+        var toggleAllChange = EventHandler.create();
         toggleAllChange
             .map(function (event) {
                 return event.target.checked;
             })
             .subscribe(TodoActions.toggleAll);
         
-        return {
+        this.handlers = {
             toggleAllChange: toggleAllChange
         }
     },
@@ -57,7 +57,7 @@ var TodoApp = React.createClass({
     }
 });
 
-module.exports = TodoApp;
+module.exports = TodoList;
 
 
 
