@@ -6,15 +6,12 @@
 'use strict';
 
 var React           = require('react/addons'),
-    Rx              = require('rx'),
-    RxMixin         = require('../utils/rxMixin'),
     EventHandler    = require('../utils/eventHandler'),
     TodoActions     = require('../actions/todoActions');
 
 var ENTER_KEY = 13;
 
 var TodoHeader = React.createClass({
-    mixins: [RxMixin],
     componentWillMount: function () {
         var newFieldKeyDown = EventHandler.create();
         var enterEvent = newFieldKeyDown.filter(function (event) {

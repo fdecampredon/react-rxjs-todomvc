@@ -8,14 +8,11 @@
 
 var React           = require('react/addons'),
     EventHandler = require('../utils/eventHandler'),
-    RxMixin         = require('../utils/rxMixin'),
     TodoActions     = require('../actions/TodoActions'),
     TodoItem        = require('./todoItem.jsx');
 
 
 var TodoList = React.createClass({
-    mixins: [RxMixin],
-    
     componentWillMount: function () {
         var toggleAllChange = EventHandler.create();
         toggleAllChange

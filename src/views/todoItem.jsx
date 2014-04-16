@@ -6,7 +6,6 @@
 'use strict';
 
 var React       = require('react/addons'),
-    RxMixin     = require('../utils/rxMixin'),
     EventHandler = require('../utils/eventHandler'),
     TodoActions = require('../actions/TodoActions');
 
@@ -14,9 +13,6 @@ var ESCAPE_KEY = 27;
 var ENTER_KEY = 13;
 
 var TodoItem = React.createClass({
-    mixins: [RxMixin],
-    
-    
     getInitialState: function () {
         return {
             editing: false,
@@ -25,6 +21,8 @@ var TodoItem = React.createClass({
     },
     
     componentWillMount: function () {
+        var setState = this.setState.bind(this);
+        
         var toggleClick = EventHandler.create();
         toggleClick
             .map(this.getTodo)
@@ -42,7 +40,7 @@ var TodoItem = React.createClass({
                     editing: true
                 };
             })
-            .subscribe(this.stateStream);
+            .subscribe(setState);
         
         var editFieldKeyDown = EventHandler.create();
         editFieldKeyDown
@@ -55,7 +53,7 @@ var TodoItem = React.createClass({
                     editText: this.props.todo.title
                 };
             }.bind(this))
-            .subscribe(this.stateStream);
+            .subscribe(setState);
         
         editFieldKeyDown
             .filter(function (event) {
@@ -75,7 +73,7 @@ var TodoItem = React.createClass({
                     editText: e.target.value
                 };
             })
-            .subscribe(this.stateStream);
+            .subscribe(setState);
         
         this.handlers = {
             toggleClick: toggleClick,

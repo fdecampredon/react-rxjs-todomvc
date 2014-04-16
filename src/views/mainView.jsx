@@ -10,14 +10,12 @@ var React           = require('react/addons'),
     Router          = require('director').Router,
     Rx              = require('rx'),
     routes          = require('../routes'),
-    RxMixin         = require('../utils/rxMixin'),
     TodoHeader      = require('./header.jsx'),
     TodoFooter      = require('./footer.jsx'),
     TodoList        = require('./todoList.jsx');
 
 
 var MainView = React.createClass({
-    mixins: [RxMixin],
     getInitialState: function () {
         return {};
     },
@@ -72,7 +70,7 @@ var MainView = React.createClass({
                    };
                 }
             )
-            .subscribe(this.stateStream);
+            .subscribe(this.setState.bind(this));
     },
     
     

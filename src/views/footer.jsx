@@ -8,13 +8,11 @@
 
 var React       = require('react/addons'),
     pluralize   = require('../utils/pluralize'),
-    RxMixin     = require('../utils/rxMixin'),
     EventHandler = require('../utils/eventHandler'),
     routes      = require('../routes'),
     TodoActions = require('../actions/TodoActions');
 
 var TodoFooter = React.createClass({
-    mixins: [RxMixin],
     componentWillMount: function () {
         var clearButtonClick = EventHandler.create();
         clearButtonClick.subscribe(TodoActions.clearCompleted);
