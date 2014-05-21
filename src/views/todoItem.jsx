@@ -5,43 +5,59 @@
 
 'use strict';
 
-var React       = require('react/addons'),
-    EventHandler = require('../utils/eventHandler'),
-    TodoActions = require('../actions/TodoActions');
+var React           = require('react/addons'),
+    EventHandler    = require('../utils/eventHandler'),
+    TodoActions     = require('../actions/TodoActions'),
+    createComp      = require('../utils/createComp');
 
 var ESCAPE_KEY = 27;
 var ENTER_KEY = 13;
 
-var TodoItem = React.createClass({
-    getInitialState: function () {
-        return {
-            editing: false,
-            editText: this.props.todo.title
-        };
+var cx = React.addons.classSet;
+
+module.exports = createComp(
+    {
+        editing: false,
+        editText: null
     },
-    
-    componentWillMount: function () {
-        var setState = this.setState.bind(this);
+    function (props, state, api) {
         
+        function submit () {
+            var val = state.editText.trim();
+            if (val) {
+                TodoActions.updateTitle.onNext({
+                    text: val,
+                    todo: props.todo
+                });
+                api.setState({
+                    editText: val, 
+                    editing: false
+                });
+            } else {
+                TodoActions.destroy.onNext(props.todo);
+            }
+        }
+
+        var todo = props.todo;
+        var getTodo = function () { return todo; };
+
         var toggleClick = EventHandler.create();
         toggleClick
-            .map(this.getTodo)
+            .map(getTodo)
             .subscribe(TodoActions.toggle);
-        
+
         var destroyButtonClick = EventHandler.create();
         destroyButtonClick
-            .map(this.getTodo)
+            .map(getTodo)
             .subscribe(TodoActions.destroy);
-        
+
         var labelDoubleClick = EventHandler.create();
         labelDoubleClick
             .map(function () { 
-                return {
-                    editing: true
-                };
+                return { editing: true };
             })
-            .subscribe(setState);
-        
+            .subscribe(api.setState);
+
         var editFieldKeyDown = EventHandler.create();
         editFieldKeyDown
             .filter(function (event) {
@@ -50,114 +66,60 @@ var TodoItem = React.createClass({
             .map(function () {
                 return {
                     editing: false,
-                    editText: this.props.todo.title
+                    editText: props.todo.title
                 };
-            }.bind(this))
-            .subscribe(setState);
-        
+            })
+            .subscribe(api.setState);
+
         editFieldKeyDown
             .filter(function (event) {
                 return event.keyCode === ENTER_KEY;
             })
-            .subscribe(this.submit);
-        
+            .subscribe(submit);
+
         var editFieldBlur  = EventHandler.create();
         editFieldBlur
-            .subscribe(this.submit);
-        
-        
+            .subscribe(submit);
+
         var editFieldChange = EventHandler.create();
         editFieldChange
             .map(function (e) {
                 return {
                     editText: e.target.value
                 };
-            })
-            .subscribe(setState);
-        
-        this.handlers = {
-            toggleClick: toggleClick,
-            destroyButtonClick: destroyButtonClick,
-            labelDoubleClick : labelDoubleClick,
-            editFieldKeyDown: editFieldKeyDown,
-            editFieldBlur: editFieldBlur,
-            editFieldChange: editFieldChange
-        };
-    },
-    
-    componentDidUpdate: function (prevProps, prevState) {
-        if (this.state.editing && !prevState.editing) {
-            var node = this.refs.editField.getDOMNode();
-            node.focus();
-            node.value = this.props.todo.title;
-            node.setSelectionRange(node.value.length, node.value.length);
-        }
-    },
-    
-    submit: function () {
-        var val = this.state.editText.trim();
-        if (val) {
-            TodoActions.updateTitle.onNext({
-                text: val,
-                todo: this.getTodo()
             });
-            this.setState({
-                editText: val, 
-                editing: false
-            });
-        } else {
-            TodoActions.destroy.onNext(this.props.todo);
-        }
-    },
-    
-    getTodo: function () {
-        return this.props.todo;
-    },
-    
 
-    /**
-     * This is a completely optional performance enhancement that you can implement
-     * on any React component. If you were to delete this method the app would still
-     * work correctly (and still be very performant!), we just use it as an example
-     * of how little code it takes to get an order of magnitude performance improvement.
-     */
-    shouldComponentUpdate: function (nextProps, nextState) {
         return (
-            nextProps.todo !== this.props.todo ||
-            nextState.editing !== this.state.editing ||
-            nextState.editText !== this.state.editText
-        );
-    },
-
-    render: function () {
-        return (
-            <li className={React.addons.classSet({
-                completed: this.props.todo.completed,
-                editing: this.state.editing
+            <li className={cx({
+                completed: props.todo.completed,
+                editing: state.editing
             })}>
                 <div className="view">
                     <input
                         className="toggle"
                         type="checkbox"
-                        onChange={this.handlers.toggleClick}
-                        checked={this.props.todo.completed}
+                        onChange={toggleClick}
+                        checked={todo.completed}
                     />
-                    <label ref="label" onDoubleClick={this.handlers.labelDoubleClick}>
-                        {this.props.todo.title}
+                    <label ref="label" onDoubleClick={labelDoubleClick}>
+                        {todo.title}
                     </label>
-                    <button ref="destroyButton" className="destroy" onClick={this.handlers.destroyButtonClick} />
+                    <button ref="destroyButton" className="destroy" onClick={destroyButtonClick} />
                 </div>
                 <input
                     ref="editField"
                     className="edit"
-                    onKeyDown={this.handlers.editFieldKeyDown}
-                    onBlur={this.handlers.editFieldBlur}
-                    value={this.state.editText}
-                    onChange={this.handlers.editFieldChange}
+                    onKeyDown={editFieldKeyDown}
+                    onBlur={editFieldBlur}
+                    value={state.editText}
+                    onChange={editFieldChange}
+                    autoFocus={true}
                 />
             </li>
         );
     }
-});
+);
 
-module.exports = TodoItem;
+
+
+
