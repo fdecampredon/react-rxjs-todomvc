@@ -6,17 +6,13 @@
 'use strict';
 
 var React       = require('react/addons'),
-    Rx          = require('rx'),
-    RxMixin     = require('../utils/rxMixin'),
+    EventHandler = require('../utils/eventHandler'),
     TodoActions = require('../actions/TodoActions');
 
 var ESCAPE_KEY = 27;
 var ENTER_KEY = 13;
 
 var TodoItem = React.createClass({
-    mixins: [RxMixin],
-    
-    
     getInitialState: function () {
         return {
             editing: false,
@@ -24,27 +20,29 @@ var TodoItem = React.createClass({
         };
     },
     
-    getSubjects: function () {
-        var toggleClick = new Rx.Subject();
+    componentWillMount: function () {
+        var setState = this.setState.bind(this);
+        
+        var toggleClick = EventHandler.create();
         toggleClick
             .map(this.getTodo)
             .subscribe(TodoActions.toggle);
         
-        var destroyButtonClick = new Rx.Subject();
+        var destroyButtonClick = EventHandler.create();
         destroyButtonClick
             .map(this.getTodo)
             .subscribe(TodoActions.destroy);
         
-        var labelDoubleClick = new Rx.Subject();
+        var labelDoubleClick = EventHandler.create();
         labelDoubleClick
             .map(function () { 
                 return {
                     editing: true
                 };
             })
-            .subscribe(this.stateStream);
+            .subscribe(setState);
         
-        var editFieldKeyDown = new Rx.Subject();
+        var editFieldKeyDown = EventHandler.create();
         editFieldKeyDown
             .filter(function (event) {
                 return event.keyCode === ESCAPE_KEY;
@@ -55,7 +53,7 @@ var TodoItem = React.createClass({
                     editText: this.props.todo.title
                 };
             }.bind(this))
-            .subscribe(this.stateStream);
+            .subscribe(setState);
         
         editFieldKeyDown
             .filter(function (event) {
@@ -63,21 +61,21 @@ var TodoItem = React.createClass({
             })
             .subscribe(this.submit);
         
-        var editFieldBlur  = new Rx.Subject();
+        var editFieldBlur  = EventHandler.create();
         editFieldBlur
             .subscribe(this.submit);
         
         
-        var editFieldChange = new Rx.Subject();
+        var editFieldChange = EventHandler.create();
         editFieldChange
             .map(function (e) {
                 return {
                     editText: e.target.value
                 };
             })
-            .subscribe(this.stateStream);
+            .subscribe(setState);
         
-        return {
+        this.handlers = {
             toggleClick: toggleClick,
             destroyButtonClick: destroyButtonClick,
             labelDoubleClick : labelDoubleClick,

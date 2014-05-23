@@ -29626,6 +29626,10 @@ var Rx      = require('rx'),
     assign  = require('../utils/assign'),
     uuid    = require('../utils/uuid');
 
+/**
+ * A set of actions that will be exposed into views
+ * Thoses actions will trigger model update
+ */
 var TodoActions = {
   create: new Rx.Subject(),
   updateTitle: new Rx.Subject(),
@@ -29635,6 +29639,11 @@ var TodoActions = {
   clearCompleted: new Rx.Subject(),
 };
 
+/**
+ * Register our actions against an updates stream
+ * each one of our actions will push operation to apply on the model
+ * into the stream.
+ */
 TodoActions.register = function (updates) {
     this.create
         .map(function (title) {
@@ -29726,8 +29735,10 @@ var Rx          = require('rx'),
     TodoActions = require('./actions/todoActions'),
     MainView    = require('./views/mainView.jsx');
 
+
 var todoStore = new TodoStore('react-todos');
 
+//register our actions against our store updates stream
 TodoActions.register(todoStore.updates);
 
 React.renderComponent(
@@ -29753,7 +29764,9 @@ var Rx      = require('rx'),
     assign  = require('../utils/assign'),
     store   = require('../utils/store');
 
-
+// our store expose 2 streams :
+// `updates`: that should receive operations to be applied on our list of todo
+// `todos`: an observable that will contains our up to date list of todo
 function TodoStore(key) {
     this.updates = new Rx.BehaviorSubject(store(key));
     
@@ -29787,47 +29800,41 @@ module.exports = function assign(target, items) {
     }, target);
 };
 },{}],169:[function(require,module,exports){
+/*jshint node:true, proto: true*/
+
+var Rx = require('rx');
+
+exports.create = function () {
+    var subject = function() {
+        subject.onNext.apply(subject, arguments);
+    };
+    
+    getEnumerablePropertyNames(Rx.Subject.prototype)
+    .forEach(function (property) {
+        subject[property] = Rx.Subject.prototype[property];
+    });
+    Rx.Subject.call(subject);
+    
+    return subject;
+};
+
+
+function getEnumerablePropertyNames(target) {
+    var result = [];
+    for (var key in target) {
+        result.push(key);
+    }
+    return result;
+}
+
+
+},{"rx":159}],170:[function(require,module,exports){
 /*jshint node:true*/
 
 module.exports = function pluralize(count, word) {
     return count === 1 ? word : word + 's';
 }
-},{}],170:[function(require,module,exports){
-/*jshint node:true*/
-
-var Rx = require('rx');
-
-var RxMixin = {
-    
-    getInitialState: function () {
-        return {};
-    },
- 
-    componentWillMount: function() {
-        this.stateStream = new Rx.Subject();
-        
-        this.stateStream.forEach(function (value) {
-            this.setState(value);
-        }.bind(this)); 
-      
-        if (!this.getSubjects) return;
-        var subjects = this.subjects = this.getSubjects();
-        var eventHandlers = {};
-        Object.keys(subjects).forEach(function(key) {
-            eventHandlers[key] = subjects[key].onNext.bind(subjects[key]);
-        });
-        this.handlers = eventHandlers;
-  },
-
-
-};
-
-module.exports = RxMixin;
-
-
-
-
-},{"rx":159}],171:[function(require,module,exports){
+},{}],171:[function(require,module,exports){
 /*jshint node:true, browser:true*/
 
 module.exports = function store(namespace, data) {
@@ -29866,18 +29873,16 @@ module.exports = function uuid() {
 
 
 var React       = require('react/addons'),
-    Rx          = require('rx'),
     pluralize   = require('../utils/pluralize'),
-    RxMixin     = require('../utils/rxMixin'),
+    EventHandler = require('../utils/eventHandler'),
     routes      = require('../routes'),
     TodoActions = require('../actions/TodoActions');
 
 var TodoFooter = React.createClass({displayName: 'TodoFooter',
-    mixins: [RxMixin],
-    getSubjects: function () {
-        var clearButtonClick = new Rx.Subject();
+    componentWillMount: function () {
+        var clearButtonClick = EventHandler.create();
         clearButtonClick.subscribe(TodoActions.clearCompleted);
-        return {
+        this.handlers = {
           clearButtonClick : clearButtonClick
         };
     },
@@ -29936,7 +29941,7 @@ var TodoFooter = React.createClass({displayName: 'TodoFooter',
 });
 
 module.exports = TodoFooter;
-},{"../actions/TodoActions":163,"../routes":166,"../utils/pluralize":169,"../utils/rxMixin":170,"react/addons":2,"rx":159}],174:[function(require,module,exports){
+},{"../actions/TodoActions":163,"../routes":166,"../utils/eventHandler":169,"../utils/pluralize":170,"react/addons":2}],174:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -29945,16 +29950,14 @@ module.exports = TodoFooter;
 'use strict';
 
 var React           = require('react/addons'),
-    Rx              = require('rx'),
-    RxMixin         = require('../utils/rxMixin'),
+    EventHandler    = require('../utils/eventHandler'),
     TodoActions     = require('../actions/todoActions');
 
 var ENTER_KEY = 13;
 
 var TodoHeader = React.createClass({displayName: 'TodoHeader',
-    mixins: [RxMixin],
-    getSubjects: function () {
-        var newFieldKeyDown = new Rx.Subject();
+    componentWillMount: function () {
+        var newFieldKeyDown = EventHandler.create();
         var enterEvent = newFieldKeyDown.filter(function (event) {
             return event.keyCode === ENTER_KEY;
         });
@@ -29978,7 +29981,7 @@ var TodoHeader = React.createClass({displayName: 'TodoHeader',
             });
         
         
-        return {
+        this.handlers = {
             newFieldKeyDown: newFieldKeyDown
         };
     },
@@ -29999,7 +30002,7 @@ var TodoHeader = React.createClass({displayName: 'TodoHeader',
 });
 
 module.exports = TodoHeader;
-},{"../actions/todoActions":164,"../utils/rxMixin":170,"react/addons":2,"rx":159}],175:[function(require,module,exports){
+},{"../actions/todoActions":164,"../utils/eventHandler":169,"react/addons":2}],175:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -30012,14 +30015,12 @@ var React           = require('react/addons'),
     Router          = require('director').Router,
     Rx              = require('rx'),
     routes          = require('../routes'),
-    RxMixin         = require('../utils/rxMixin'),
     TodoHeader      = require('./header.jsx'),
     TodoFooter      = require('./footer.jsx'),
     TodoList        = require('./todoList.jsx');
 
 
 var MainView = React.createClass({displayName: 'MainView',
-    mixins: [RxMixin],
     getInitialState: function () {
         return {};
     },
@@ -30074,7 +30075,7 @@ var MainView = React.createClass({displayName: 'MainView',
                    };
                 }
             )
-            .subscribe(this.stateStream);
+            .subscribe(this.setState.bind(this));
     },
     
     
@@ -30109,7 +30110,7 @@ module.exports = MainView;
 
 
 
-},{"../routes":166,"../utils/rxMixin":170,"./footer.jsx":173,"./header.jsx":174,"./todoList.jsx":177,"director":1,"react/addons":2,"rx":159}],176:[function(require,module,exports){
+},{"../routes":166,"./footer.jsx":173,"./header.jsx":174,"./todoList.jsx":177,"director":1,"react/addons":2,"rx":159}],176:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -30118,17 +30119,13 @@ module.exports = MainView;
 'use strict';
 
 var React       = require('react/addons'),
-    Rx          = require('rx'),
-    RxMixin     = require('../utils/rxMixin'),
+    EventHandler = require('../utils/eventHandler'),
     TodoActions = require('../actions/TodoActions');
 
 var ESCAPE_KEY = 27;
 var ENTER_KEY = 13;
 
 var TodoItem = React.createClass({displayName: 'TodoItem',
-    mixins: [RxMixin],
-    
-    
     getInitialState: function () {
         return {
             editing: false,
@@ -30136,27 +30133,29 @@ var TodoItem = React.createClass({displayName: 'TodoItem',
         };
     },
     
-    getSubjects: function () {
-        var toggleClick = new Rx.Subject();
+    componentWillMount: function () {
+        var setState = this.setState.bind(this);
+        
+        var toggleClick = EventHandler.create();
         toggleClick
             .map(this.getTodo)
             .subscribe(TodoActions.toggle);
         
-        var destroyButtonClick = new Rx.Subject();
+        var destroyButtonClick = EventHandler.create();
         destroyButtonClick
             .map(this.getTodo)
             .subscribe(TodoActions.destroy);
         
-        var labelDoubleClick = new Rx.Subject();
+        var labelDoubleClick = EventHandler.create();
         labelDoubleClick
             .map(function () { 
                 return {
                     editing: true
                 };
             })
-            .subscribe(this.stateStream);
+            .subscribe(setState);
         
-        var editFieldKeyDown = new Rx.Subject();
+        var editFieldKeyDown = EventHandler.create();
         editFieldKeyDown
             .filter(function (event) {
                 return event.keyCode === ESCAPE_KEY;
@@ -30167,7 +30166,7 @@ var TodoItem = React.createClass({displayName: 'TodoItem',
                     editText: this.props.todo.title
                 };
             }.bind(this))
-            .subscribe(this.stateStream);
+            .subscribe(setState);
         
         editFieldKeyDown
             .filter(function (event) {
@@ -30175,21 +30174,21 @@ var TodoItem = React.createClass({displayName: 'TodoItem',
             })
             .subscribe(this.submit);
         
-        var editFieldBlur  = new Rx.Subject();
+        var editFieldBlur  = EventHandler.create();
         editFieldBlur
             .subscribe(this.submit);
         
         
-        var editFieldChange = new Rx.Subject();
+        var editFieldChange = EventHandler.create();
         editFieldChange
             .map(function (e) {
                 return {
                     editText: e.target.value
                 };
             })
-            .subscribe(this.stateStream);
+            .subscribe(setState);
         
-        return {
+        this.handlers = {
             toggleClick: toggleClick,
             destroyButtonClick: destroyButtonClick,
             labelDoubleClick : labelDoubleClick,
@@ -30276,7 +30275,7 @@ var TodoItem = React.createClass({displayName: 'TodoItem',
 
 module.exports = TodoItem;
 
-},{"../actions/TodoActions":163,"../utils/rxMixin":170,"react/addons":2,"rx":159}],177:[function(require,module,exports){
+},{"../actions/TodoActions":163,"../utils/eventHandler":169,"react/addons":2}],177:[function(require,module,exports){
 /**
  * @jsx React.DOM
  */
@@ -30286,24 +30285,21 @@ module.exports = TodoItem;
 'use strict';
 
 var React           = require('react/addons'),
-    Rx              = require('rx'),
-    RxMixin         = require('../utils/rxMixin'),
+    EventHandler = require('../utils/eventHandler'),
     TodoActions     = require('../actions/TodoActions'),
     TodoItem        = require('./todoItem.jsx');
 
 
-var TodoApp = React.createClass({displayName: 'TodoApp',
-    mixins: [RxMixin],
-    
-    getSubjects: function () {
-        var toggleAllChange = new Rx.Subject();
+var TodoList = React.createClass({displayName: 'TodoList',
+    componentWillMount: function () {
+        var toggleAllChange = EventHandler.create();
         toggleAllChange
             .map(function (event) {
                 return event.target.checked;
             })
             .subscribe(TodoActions.toggleAll);
         
-        return {
+        this.handlers = {
             toggleAllChange: toggleAllChange
         }
     },
@@ -30336,13 +30332,13 @@ var TodoApp = React.createClass({displayName: 'TodoApp',
     }
 });
 
-module.exports = TodoApp;
+module.exports = TodoList;
 
 
 
 
 
-},{"../actions/TodoActions":163,"../utils/rxMixin":170,"./todoItem.jsx":176,"react/addons":2,"rx":159}],178:[function(require,module,exports){
+},{"../actions/TodoActions":163,"../utils/eventHandler":169,"./todoItem.jsx":176,"react/addons":2}],178:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a

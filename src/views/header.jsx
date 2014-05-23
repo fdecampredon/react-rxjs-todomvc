@@ -6,16 +6,14 @@
 'use strict';
 
 var React           = require('react/addons'),
-    Rx              = require('rx'),
-    RxMixin         = require('../utils/rxMixin'),
+    EventHandler    = require('../utils/eventHandler'),
     TodoActions     = require('../actions/todoActions');
 
 var ENTER_KEY = 13;
 
 var TodoHeader = React.createClass({
-    mixins: [RxMixin],
-    getSubjects: function () {
-        var newFieldKeyDown = new Rx.Subject();
+    componentWillMount: function () {
+        var newFieldKeyDown = EventHandler.create();
         var enterEvent = newFieldKeyDown.filter(function (event) {
             return event.keyCode === ENTER_KEY;
         });
@@ -39,7 +37,7 @@ var TodoHeader = React.createClass({
             });
         
         
-        return {
+        this.handlers = {
             newFieldKeyDown: newFieldKeyDown
         };
     },
