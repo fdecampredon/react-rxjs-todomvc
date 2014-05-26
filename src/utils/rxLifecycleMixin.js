@@ -19,18 +19,18 @@ var RxLifecycleMixin = {
     },
     
     componentWillReceiveProps: function (nextProps) {
-        this.lifecycle.componentDidMount.onNext(nextProps);
+        this.lifecycle.componentWillReceiveProps.onNext(nextProps);
     },
     
     componentWillUpdate: function (nextProps, nextState) {
-        this.lifecycle.componentDidMount.onNext({
+        this.lifecycle.componentWillUpdate.onNext({
             nextProps: nextProps, 
             nextState: nextState
         });
     },
     
     componentDidUpdate: function (prevProps, prevState) {
-        this.lifecycle.componentDidMount.onNext({
+        this.lifecycle.componentDidUpdate.onNext({
             prevProps: prevProps, 
             prevState: prevState
         });
