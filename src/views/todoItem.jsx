@@ -77,14 +77,16 @@ var TodoItem = React.createClass({
             })
             .subscribe(setState);
         
-        this.lifecycle.componentDidUpdate.forEach(function (prev) {
-            if (this.state.editing && !prev.prevState.editing) {
+        this.lifecycle.componentDidUpdate
+            .filter(function (prev) {
+                return this.state.editing && !prev.prevState.editing;
+            }.bind(this))
+            .subscribe(function() {
                 var node = this.refs.editField.getDOMNode();
                 node.focus();
                 node.value = this.props.todo.title;
                 node.setSelectionRange(node.value.length, node.value.length);
-            }
-        }.bind(this));
+            }.bind(this));
         
         this.handlers = {
             toggleClick: toggleClick,
