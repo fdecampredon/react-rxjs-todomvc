@@ -5,14 +5,16 @@
 
 'use strict';
 
-var React       = require('react/addons'),
-    EventHandler = require('../utils/eventHandler'),
-    TodoActions = require('../actions/TodoActions');
+var React               = require('react/addons'),
+    EventHandler        = require('../utils/eventHandler'),
+    TodoActions         = require('../actions/TodoActions'),
+    RxLifecycleMixin    = require('../utils/rxLifecycleMixin');
 
 var ESCAPE_KEY = 27;
 var ENTER_KEY = 13;
 
 var TodoItem = React.createClass({
+    mixins: [RxLifecycleMixin],
     getInitialState: function () {
         return {
             editing: false,
@@ -75,6 +77,15 @@ var TodoItem = React.createClass({
             })
             .subscribe(setState);
         
+        this.lifecycle.componentDidUpdate.forEach(function (prev) {
+            if (this.state.editing && !prev.prevState.editing) {
+                var node = this.refs.editField.getDOMNode();
+                node.focus();
+                node.value = this.props.todo.title;
+                node.setSelectionRange(node.value.length, node.value.length);
+            }
+        }.bind(this));
+        
         this.handlers = {
             toggleClick: toggleClick,
             destroyButtonClick: destroyButtonClick,
@@ -85,14 +96,6 @@ var TodoItem = React.createClass({
         };
     },
     
-    componentDidUpdate: function (prevProps, prevState) {
-        if (this.state.editing && !prevState.editing) {
-            var node = this.refs.editField.getDOMNode();
-            node.focus();
-            node.value = this.props.todo.title;
-            node.setSelectionRange(node.value.length, node.value.length);
-        }
-    },
     
     submit: function () {
         var val = this.state.editText.trim();
