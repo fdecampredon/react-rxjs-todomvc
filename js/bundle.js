@@ -29834,6 +29834,7 @@ function getEnumerablePropertyNames(target) {
 module.exports = function pluralize(count, word) {
     return count === 1 ? word : word + 's';
 };
+
 },{}],171:[function(require,module,exports){
 /*jshint node:true*/
 
@@ -29856,18 +29857,18 @@ var RxLifecycleMixin = {
     },
     
     componentWillReceiveProps: function (nextProps) {
-        this.lifecycle.componentDidMount.onNext(nextProps);
+        this.lifecycle.componentWillReceiveProps.onNext(nextProps);
     },
     
     componentWillUpdate: function (nextProps, nextState) {
-        this.lifecycle.componentDidMount.onNext({
+        this.lifecycle.componentWillUpdate.onNext({
             nextProps: nextProps, 
             nextState: nextState
         });
     },
     
     componentDidUpdate: function (prevProps, prevState) {
-        this.lifecycle.componentDidMount.onNext({
+        this.lifecycle.componentDidUpdate.onNext({
             prevProps: prevProps, 
             prevState: prevState
         });
@@ -29879,6 +29880,7 @@ var RxLifecycleMixin = {
 };
 
 module.exports = RxLifecycleMixin;
+
 },{"rx":159}],172:[function(require,module,exports){
 /*jshint node:true, browser:true*/
 
