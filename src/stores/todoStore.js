@@ -1,31 +1,14 @@
 /*jshint node:true*/
 
-var Rx      = require('rx'),
-    assign  = require('../utils/assign'),
-    store   = require('../utils/store'),
-    uuid    = require('../utils/uuid');
+var RxProperty  = require('../utils/rxProperty'),
+    assign      = require('../utils/assign'),
+    store       = require('../utils/store'),
+    uuid        = require('../utils/uuid');
 
-// our store expose 2 streams :
-// `updates`: that should receive operations to be applied on our list of todo
-// `todos`: an observable that will contains our up to date list of todo
-function TodoStore(key) {
-    this.updates = new Rx.BehaviorSubject(store(key));
-    
-    this.todos = this.updates
-        .scan(function (todos, operation) {
-            return operation(todos);
-        });
-    
-    
-    this.key = key;
-    this.todos.forEach(function (todos) {
-        store(key, todos);
-    });
-}
 
 var key = 'todoapp';
 
-var todosSubject = new Rx.BehaviorSubject(store(key));
+var todosSubject = new RxProperty(store(key));
 todosSubject.subscribe(function (value) {
     store(key, value);
 });
@@ -34,7 +17,7 @@ var TodoStore = {
     todos: todosSubject.asObservable(),
     
     
-    createTodo(title) {
+    createTodo: function (title) {
         todosSubject.update(function (todos) {
             return todos.concat({
                 id: uuid(),
@@ -44,18 +27,18 @@ var TodoStore = {
         });
     },
     
-    updateTitle(todoToSave, text) {
+    updateTitle: function (updates) {
          todosSubject.update(function (todos) {
             return todos.map(function (todo) {
-                return  todo !== todoToSave  ?
+                return  todo !== updates.todo  ?
                             todo :
-                            assign({}, todo, {title: text})
+                            assign({}, todo, {title: updates.text})
                 ;
             });
          });
     },
     
-    toggle(todoToToggle) {
+    toggle: function (todoToToggle) {
         todosSubject.update(function (todos) {
             return todos.map(function (todo) {
                 return  todo !== todoToToggle ?
@@ -65,7 +48,7 @@ var TodoStore = {
         });
     },
     
-    toggleAll(checked) {
+    toggleAll: function (checked) {
         todosSubject.update(function (todos) {
             return todos.map(function (todo) {
                 return {
@@ -77,7 +60,7 @@ var TodoStore = {
         });
     },
     
-    destroy(deletedTodo) {
+    destroy: function (deletedTodo) {
         todosSubject.update(function (todos) {
             return todos.filter(function (todo) {
                 return todo !== deletedTodo;
@@ -85,7 +68,7 @@ var TodoStore = {
         });
     },
         
-    clearCompleted() {
+    clearCompleted: function () {
         todosSubject.update(function (todos) {
             return todos.filter(function (todo) {
                 return !todo.completed;

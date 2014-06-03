@@ -17,3 +17,5 @@ Property.prototype = Object.create(Rx.BehaviorSubject.prototype, {
 Property.prototype.update = function (func) {
     this.onNext(func(this.value));
 };
+
+module.exports = Property;
