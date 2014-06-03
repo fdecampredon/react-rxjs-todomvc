@@ -10,6 +10,7 @@ var React           = require('react/addons'),
     Router          = require('director').Router,
     Rx              = require('rx'),
     TodoStore       = require('../stores/todoStore'),
+    TodoActions     = require('../actions/todoActions'),
     routes          = require('../routes'),
     TodoHeader      = require('./header.jsx'),
     TodoFooter      = require('./footer.jsx'),
@@ -19,6 +20,27 @@ var React           = require('react/addons'),
 var MainView = React.createClass({
     getInitialState: function () {
         return {};
+    },
+    
+    childContextTypes: {
+        create: React.PropTypes.func,
+        updateTitle: React.PropTypes.func,
+        toggle: React.PropTypes.func,
+        toggleAll: React.PropTypes.func,
+        destroy: React.PropTypes.func,
+        clearCompleted: React.PropTypes.func
+    },
+    
+    getChildContext: function () {
+        return Object.keys(TodoActions).reduce(
+            function (context, key) {
+                context[key] = function (val) {
+                    console.log('command : ' + key + ' invoked with value: ' + JSON.stringify(val, null, 4));
+                    TodoActions[key](val);
+                };
+                return context;
+            }, {}
+        );
     },
     
     componentWillMount: function () {

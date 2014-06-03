@@ -6,12 +6,15 @@
 'use strict';
 
 var React           = require('react/addons'),
-    EventHandler    = require('../utils/eventHandler'),
-    TodoActions     = require('../actions/todoActions');
+    EventHandler    = require('../utils/eventHandler');
 
 var ENTER_KEY = 13;
 
 var TodoHeader = React.createClass({
+    contextTypes: {
+        create: React.PropTypes.func,
+    },
+    
     componentWillMount: function () {
         var newFieldKeyDown = EventHandler.create();
         var enterEvent = newFieldKeyDown.filter(function (event) {
@@ -28,7 +31,7 @@ var TodoHeader = React.createClass({
                 return event.target.value.trim();
             })
             .filter(value => !!value)
-            .subscribe(TodoActions.create);
+            .subscribe(this.context.create);
         
         enterEvent
             .forEach(function (event) {

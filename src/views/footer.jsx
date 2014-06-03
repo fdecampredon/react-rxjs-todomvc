@@ -9,13 +9,16 @@
 var React           = require('react/addons'),
     pluralize       = require('../utils/pluralize'),
     EventHandler    = require('../utils/eventHandler'),
-    routes          = require('../routes'),
-    TodoActions     = require('../actions/TodoActions');
+    routes          = require('../routes');
 
 var TodoFooter = React.createClass({
+    contextTypes: {
+        clearCompleted: React.PropTypes.func,
+    },
+    
     componentWillMount: function () {
         var clearButtonClick = EventHandler.create();
-        clearButtonClick.subscribe(TodoActions.clearCompleted);
+        clearButtonClick.subscribe(this.context.clearCompleted);
         this.handlers = {
           clearButtonClick : clearButtonClick
         };

@@ -8,16 +8,19 @@
 
 var React           = require('react/addons'),
     EventHandler = require('../utils/eventHandler'),
-    TodoActions     = require('../actions/TodoActions'),
     TodoItem        = require('./todoItem.jsx');
 
 
 var TodoList = React.createClass({
+    contextTypes: {
+        toggleAll: React.PropTypes.func
+    },
+    
     componentWillMount: function () {
         var toggleAllChange = EventHandler.create();
         toggleAllChange
             .map(event => event.target.checked)
-            .subscribe(TodoActions.toggleAll);
+            .subscribe(this.context.toggleAll);
         
         this.handlers = {
             toggleAllChange: toggleAllChange

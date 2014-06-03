@@ -8,7 +8,6 @@
 
 var React               = require('react/addons'),
     EventHandler        = require('../utils/eventHandler'),
-    TodoActions         = require('../actions/TodoActions'),
     RxLifecycleMixin    = require('../utils/rxLifecycleMixin');
 
 var ESCAPE_KEY = 27;
@@ -16,6 +15,13 @@ var ENTER_KEY = 13;
 
 var TodoItem = React.createClass({
     mixins: [RxLifecycleMixin],
+    
+    contextTypes: {
+        toggle: React.PropTypes.func,
+        destroy: React.PropTypes.func,
+        updateTitle: React.PropTypes.func,
+    },
+    
     getInitialState: function () {
         return {
             editing: false,
@@ -29,12 +35,12 @@ var TodoItem = React.createClass({
         var toggleClick = EventHandler.create();
         toggleClick
             .map(() => this.props.todo)
-            .subscribe(TodoActions.toggle);
+            .subscribe(this.context.toggle);
         
         var destroyButtonClick = EventHandler.create();
         destroyButtonClick
             .map(() => this.props.todo)
-            .subscribe(TodoActions.destroy);
+            .subscribe(this.context.destroy);
         
         var labelDoubleClick = EventHandler.create();
         labelDoubleClick
@@ -89,7 +95,7 @@ var TodoItem = React.createClass({
     submit: function () {
         var val = this.state.editText.trim();
         if (val) {
-            TodoActions.updateTitle({
+            this.context.updateTitle({
                 text: val,
                 todo: this.props.todo
             });
@@ -98,7 +104,7 @@ var TodoItem = React.createClass({
                 editing: false
             });
         } else {
-            TodoActions.destroy(this.props.todo);
+            this.context.destroy(this.props.todo);
         }
     },
     
