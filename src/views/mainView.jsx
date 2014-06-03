@@ -2,13 +2,14 @@
  * @jsx React.DOM
  */
 
-/*jshint node: true, browser: true, newcap:false*/
+/*jshint node: true, browser: true, newcap:false, esnext: true*/
 'use strict';
 
 
 var React           = require('react/addons'),
     Router          = require('director').Router,
     Rx              = require('rx'),
+    TodoStore       = require('../stores/todoStore');
     routes          = require('../routes'),
     TodoHeader      = require('./header.jsx'),
     TodoFooter      = require('./footer.jsx'),
@@ -20,9 +21,7 @@ var MainView = React.createClass({
         return {};
     },
     
-    componentWillMount: function () {
-        var todoStore = this.props.todoStore;
-            
+    componentWillMount() {
         var currentRoute = new Rx.BehaviorSubject(''),
             onNext = currentRoute.onNext;    
 
@@ -40,7 +39,7 @@ var MainView = React.createClass({
         
         router.init('/');
         
-        var shownTodos = todoStore.todos
+        var shownTodos = TodoStore.todos
             .combineLatest(
                 currentRoute,
                 function (todos, currentRoute) { 
@@ -70,12 +69,12 @@ var MainView = React.createClass({
                    };
                 }
             )
-            .subscribe(this.setState.bind(this));
+            .subscribe(val => this.setState(val));
     },
     
     
     
-    render: function () {
+    render() {
         var footer;
         if (this.state.activeTodoCount || this.state.completedCount) {
             footer = <TodoFooter count={this.state.activeTodoCount}

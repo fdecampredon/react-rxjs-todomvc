@@ -4,16 +4,29 @@
   "description": "TodoMVC implementations with React and RxJS",
   "main": "index.js",
   "dependencies": {
-    "reactify": "~0.10.0",
-    "envify": "~1.2.1",
     "react": "~0.10.0",
     "director": "~1.2.3",
-    "rx": "~2.2.17"
+    "rx": "~2.2.17",
+    "bluebird": "~1.2.4"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "reactify": "~0.13.1",
+    "browserify": "~4.1.5",
+    "envify": "~1.2.1"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "browserify -t reactify src/app.js -o js/bundle.js "
+    "install": "browserify  src/app.js -o js/bundle.js "
+  },
+  "browserify": {
+    "transform": [
+      [
+        "reactify",
+        {
+          "es6": true
+        }
+      ]
+    ]
   },
   "author": "François de Campredon <francois.de.campredon@gmail.com> (https://github.com/fdecampredon)",
   "license": "Apache Version 2"
