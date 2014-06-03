@@ -2,7 +2,7 @@
  * @jsx React.DOM
  */
 
-/*jshint node:true*/
+/*jshint node:true, esnext: true*/
 
 'use strict';
 
@@ -16,14 +16,14 @@ var ENTER_KEY = 13;
 
 var TodoItem = React.createClass({
     mixins: [RxLifecycleMixin],
-    getInitialState() {
+    getInitialState: function () {
         return {
             editing: false,
             editText: this.props.todo.title
         };
     },
     
-    componentWillMount() {
+    componentWillMount: function () {
         var setState = this.setState.bind(this);
         
         var toggleClick = EventHandler.create();
@@ -43,7 +43,7 @@ var TodoItem = React.createClass({
         
         var editFieldKeyDown = EventHandler.create();
         editFieldKeyDown
-            .filter(event = event.keyCode === ESCAPE_KEY)
+            .filter(event => event.keyCode === ESCAPE_KEY)
             .map(() => {
                 return{
                     editing: false,
@@ -86,19 +86,19 @@ var TodoItem = React.createClass({
     },
     
     
-    submit() {
+    submit: function () {
         var val = this.state.editText.trim();
         if (val) {
-            TodoActions.updateTitle.onNext({
+            TodoActions.updateTitle({
                 text: val,
-                todo: this.getTodo()
+                todo: this.props.todo
             });
             this.setState({
                 editText: val, 
                 editing: false
             });
         } else {
-            TodoActions.destroy.onNext(this.props.todo);
+            TodoActions.destroy(this.props.todo);
         }
     },
     
@@ -109,7 +109,7 @@ var TodoItem = React.createClass({
      * work correctly (and still be very performant!), we just use it as an example
      * of how little code it takes to get an order of magnitude performance improvement.
      */
-    shouldComponentUpdate(nextProps, nextState) {
+    shouldComponentUpdate: function (nextProps, nextState) {
         return (
             nextProps.todo !== this.props.todo ||
             nextState.editing !== this.state.editing ||
@@ -117,7 +117,7 @@ var TodoItem = React.createClass({
         );
     },
 
-    render() {
+    render: function () {
         return (
             <li className={React.addons.classSet({
                 completed: this.props.todo.completed,

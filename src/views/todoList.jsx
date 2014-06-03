@@ -13,7 +13,7 @@ var React           = require('react/addons'),
 
 
 var TodoList = React.createClass({
-    componentWillMount() {
+    componentWillMount: function () {
         var toggleAllChange = EventHandler.create();
         toggleAllChange
             .map(event => event.target.checked)
@@ -26,7 +26,7 @@ var TodoList = React.createClass({
     
     
 
-    render() {
+    render: function () {
         var todoItems = this.props.todos.map(function (todo) {
             return (
                 <TodoItem

@@ -13,7 +13,7 @@ var React           = require('react/addons'),
     TodoActions     = require('../actions/TodoActions');
 
 var TodoFooter = React.createClass({
-    componentWillMount() {
+    componentWillMount: function () {
         var clearButtonClick = EventHandler.create();
         clearButtonClick.subscribe(TodoActions.clearCompleted);
         this.handlers = {
@@ -21,7 +21,7 @@ var TodoFooter = React.createClass({
         };
     },
     
-    render() {
+    render: function () {
         var activeTodoWord = pluralize(this.props.count, 'item');
         var clearButton = null;
 

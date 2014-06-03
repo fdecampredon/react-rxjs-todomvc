@@ -9,7 +9,7 @@
 var React           = require('react/addons'),
     Router          = require('director').Router,
     Rx              = require('rx'),
-    TodoStore       = require('../stores/todoStore');
+    TodoStore       = require('../stores/todoStore'),
     routes          = require('../routes'),
     TodoHeader      = require('./header.jsx'),
     TodoFooter      = require('./footer.jsx'),
@@ -21,7 +21,7 @@ var MainView = React.createClass({
         return {};
     },
     
-    componentWillMount() {
+    componentWillMount: function () {
         var currentRoute = new Rx.BehaviorSubject(''),
             onNext = currentRoute.onNext;    
 
@@ -74,7 +74,7 @@ var MainView = React.createClass({
     
     
     
-    render() {
+    render: function () {
         var footer;
         if (this.state.activeTodoCount || this.state.completedCount) {
             footer = <TodoFooter count={this.state.activeTodoCount}
