@@ -6,14 +6,14 @@
 'use strict';
 
 
-var React       = require('react/addons'),
-    pluralize   = require('../utils/pluralize'),
-    EventHandler = require('../utils/eventHandler'),
-    routes      = require('../routes'),
-    TodoActions = require('../actions/TodoActions');
+var React           = require('react/addons'),
+    pluralize       = require('../utils/pluralize'),
+    EventHandler    = require('../utils/eventHandler'),
+    routes          = require('../routes'),
+    TodoActions     = require('../actions/TodoActions');
 
 var TodoFooter = React.createClass({
-    componentWillMount: function () {
+    componentWillMount() {
         var clearButtonClick = EventHandler.create();
         clearButtonClick.subscribe(TodoActions.clearCompleted);
         this.handlers = {
@@ -21,7 +21,7 @@ var TodoFooter = React.createClass({
         };
     },
     
-    render: function () {
+    render() {
         var activeTodoWord = pluralize(this.props.count, 'item');
         var clearButton = null;
 

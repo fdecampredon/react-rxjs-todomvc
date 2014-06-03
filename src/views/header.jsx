@@ -12,7 +12,7 @@ var React           = require('react/addons'),
 var ENTER_KEY = 13;
 
 var TodoHeader = React.createClass({
-    componentWillMount: function () {
+    componentWillMount() {
         var newFieldKeyDown = EventHandler.create();
         var enterEvent = newFieldKeyDown.filter(function (event) {
             return event.keyCode === ENTER_KEY;
@@ -27,9 +27,8 @@ var TodoHeader = React.createClass({
             .map(function (event) {
                 return event.target.value.trim();
             })
-            .filter(function (value) {
-                return !!value;
-            }).subscribe(TodoActions.create);
+            .filter(value => !!value)
+            .subscribe(TodoActions.create);
         
         enterEvent
             .forEach(function (event) {
@@ -42,7 +41,7 @@ var TodoHeader = React.createClass({
         };
     },
     
-    render: function () {
+    render() {
         return (
             <header id="header">
                 <h1>todos</h1>

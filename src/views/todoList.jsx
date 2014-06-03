@@ -13,12 +13,10 @@ var React           = require('react/addons'),
 
 
 var TodoList = React.createClass({
-    componentWillMount: function () {
+    componentWillMount() {
         var toggleAllChange = EventHandler.create();
         toggleAllChange
-            .map(function (event) {
-                return event.target.checked;
-            })
+            .map(event => event.target.checked)
             .subscribe(TodoActions.toggleAll);
         
         this.handlers = {
@@ -28,15 +26,15 @@ var TodoList = React.createClass({
     
     
 
-    render: function () {
+    render() {
         var todoItems = this.props.todos.map(function (todo) {
             return (
                 <TodoItem
                     key={todo.id}
                     todo={todo}
                 />
-            );
-        }, this);
+            )
+        });
         
         return (
             <section id="main">

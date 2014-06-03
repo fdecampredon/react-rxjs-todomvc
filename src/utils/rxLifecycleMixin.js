@@ -3,7 +3,7 @@
 var Rx = require('rx');
 
 var RxLifecycleMixin = {
-    componentWillMount: function () {
+    componentWillMount() {
         this.lifecycle = {
             componentWillMount: new Rx.Subject(),
             componentDidMount : new Rx.Subject(),
@@ -14,29 +14,29 @@ var RxLifecycleMixin = {
         };
     },
     
-    componentDidMount: function () {
+    componentDidMount() {
         this.lifecycle.componentDidMount.onNext();
     },
     
-    componentWillReceiveProps: function (nextProps) {
+    componentWillReceiveProps(nextProps) {
         this.lifecycle.componentWillReceiveProps.onNext(nextProps);
     },
     
-    componentWillUpdate: function (nextProps, nextState) {
+    componentWillUpdate(nextProps, nextState) {
         this.lifecycle.componentWillUpdate.onNext({
             nextProps: nextProps, 
             nextState: nextState
         });
     },
     
-    componentDidUpdate: function (prevProps, prevState) {
+    componentDidUpdate(prevProps, prevState) {
         this.lifecycle.componentDidUpdate.onNext({
             prevProps: prevProps, 
             prevState: prevState
         });
     },
     
-    componentWillUnmount: function () {
+    componentWillUnmount() {
         this.lifecycle.componentWillUnmount.onNext();
     }
 };

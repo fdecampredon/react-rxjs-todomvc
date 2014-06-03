@@ -1,6 +1,7 @@
 /**
  * @jsx React.DOM
  */
+
 /*jshint node:true*/
 
 'use strict';
@@ -15,52 +16,44 @@ var ENTER_KEY = 13;
 
 var TodoItem = React.createClass({
     mixins: [RxLifecycleMixin],
-    getInitialState: function () {
+    getInitialState() {
         return {
             editing: false,
             editText: this.props.todo.title
         };
     },
     
-    componentWillMount: function () {
+    componentWillMount() {
         var setState = this.setState.bind(this);
         
         var toggleClick = EventHandler.create();
         toggleClick
-            .map(this.getTodo)
+            .map(() => this.props.todo)
             .subscribe(TodoActions.toggle);
         
         var destroyButtonClick = EventHandler.create();
         destroyButtonClick
-            .map(this.getTodo)
+            .map(() => this.props.todo)
             .subscribe(TodoActions.destroy);
         
         var labelDoubleClick = EventHandler.create();
         labelDoubleClick
-            .map(function () { 
-                return {
-                    editing: true
-                };
-            })
+            .map(() => { return { editing: true}; })
             .subscribe(setState);
         
         var editFieldKeyDown = EventHandler.create();
         editFieldKeyDown
-            .filter(function (event) {
-                return event.keyCode === ESCAPE_KEY;
-            })
-            .map(function () {
-                return {
+            .filter(event = event.keyCode === ESCAPE_KEY)
+            .map(() => {
+                return{
                     editing: false,
                     editText: this.props.todo.title
                 };
-            }.bind(this))
+             })
             .subscribe(setState);
         
         editFieldKeyDown
-            .filter(function (event) {
-                return event.keyCode === ENTER_KEY;
-            })
+            .filter(event => event.keyCode === ENTER_KEY)
             .subscribe(this.submit);
         
         var editFieldBlur  = EventHandler.create();
@@ -70,23 +63,17 @@ var TodoItem = React.createClass({
         
         var editFieldChange = EventHandler.create();
         editFieldChange
-            .map(function (e) {
-                return {
-                    editText: e.target.value
-                };
-            })
+            .map(e => { return { editText: e.target.value }; })
             .subscribe(setState);
         
         this.lifecycle.componentDidUpdate
-            .filter(function (prev) {
-                return this.state.editing && !prev.prevState.editing;
-            }.bind(this))
-            .subscribe(function() {
+            .filter(prev => this.state.editing && !prev.prevState.editing)
+            .subscribe(() => {
                 var node = this.refs.editField.getDOMNode();
                 node.focus();
                 node.value = this.props.todo.title;
                 node.setSelectionRange(node.value.length, node.value.length);
-            }.bind(this));
+            });
         
         this.handlers = {
             toggleClick: toggleClick,
@@ -99,7 +86,7 @@ var TodoItem = React.createClass({
     },
     
     
-    submit: function () {
+    submit() {
         var val = this.state.editText.trim();
         if (val) {
             TodoActions.updateTitle.onNext({
@@ -115,10 +102,6 @@ var TodoItem = React.createClass({
         }
     },
     
-    getTodo: function () {
-        return this.props.todo;
-    },
-    
 
     /**
      * This is a completely optional performance enhancement that you can implement
@@ -126,7 +109,7 @@ var TodoItem = React.createClass({
      * work correctly (and still be very performant!), we just use it as an example
      * of how little code it takes to get an order of magnitude performance improvement.
      */
-    shouldComponentUpdate: function (nextProps, nextState) {
+    shouldComponentUpdate(nextProps, nextState) {
         return (
             nextProps.todo !== this.props.todo ||
             nextState.editing !== this.state.editing ||
@@ -134,7 +117,7 @@ var TodoItem = React.createClass({
         );
     },
 
-    render: function () {
+    render() {
         return (
             <li className={React.addons.classSet({
                 completed: this.props.todo.completed,
