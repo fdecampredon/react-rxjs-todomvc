@@ -12,11 +12,13 @@
   "devDependencies": {
     "reactify": "~0.13.1",
     "browserify": "~4.1.5",
-    "envify": "~1.2.1"
+    "envify": "~1.2.1",
+    "watchify": "~0.10.2"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "install": "browserify  src/app.js -o js/bundle.js "
+    "install": "browserify  src/app.js -o js/bundle.js ",
+    "watch-js": "watchify src/app.js -o js/bundle.js"
   },
   "browserify": {
     "transform": [
