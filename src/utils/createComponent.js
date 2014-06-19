@@ -24,7 +24,7 @@ function shallowEqual(objA, objB) {
   return true;
 }
 
-function createComp(initialState, render, shouldComponentUpdate) {
+function createComponent(initialState, render, shouldComponentUpdate) {
     if (typeof initialState === 'function') {
         shouldComponentUpdate = render;
         render = initialState;
@@ -80,4 +80,4 @@ function createComp(initialState, render, shouldComponentUpdate) {
     });
     return component;
 }
-module.exports = createComp;
+module.exports = createComponent;
