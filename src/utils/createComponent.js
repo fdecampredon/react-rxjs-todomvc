@@ -24,58 +24,18 @@ function shallowEqual(objA, objB) {
   return true;
 }
 
-function createComponent(initialState, render, shouldComponentUpdate) {
-    if (typeof initialState === 'function') {
-        shouldComponentUpdate = render;
-        render = initialState;
-        initialState = {};
-    }
+function createComponent(render, shouldComponentUpdate) {
     shouldComponentUpdate = shouldComponentUpdate || function (nextProps, nexState) {
-        return !shallowEqual(this.props, nextProps) || 
-            !shallowEqual(this.state, nexState);
+        return !shallowEqual(this.props || {}, nextProps || {}) || 
+            !shallowEqual(this.state || {}, nexState || {});
     };
-    
-    var api = {
-        componentWillMount: new Rx.Subject(),
-        componentDidMount : new Rx.Subject(),
-        componentWillReceiveProps : new Rx.Subject(),
-        componentWillUpdate : new Rx.Subject(),
-        componentWillUnmount: new Rx.Subject(),
-        
-        getDOMNode: function () {
-            return component.getDOMNode();
-        },
-        setState: function (state, callback) {
-            component.setState(state, callback);
-        }
-    };
-    
     var component = React.createClass({
-        getInitialState: function () {
-            return initialState;
-        },
-        componentWillMount: function () {
-          api.componentWillMount.onNext();  
-        },
-        componentDidMount: function () {
-          api.componentDidMount.onNext();  
-        },
-        componentWillReceiveProps: function (nextProps) {
-          api.componentWillMount.onNext(nextProps);  
-        },
-        componentWillUpdate: function (nextProps, nextState) {
-          api.componentWillMount.onNext({
-              nextProps: nextProps,
-              nextState: nextState
-          });  
-        },
-        componentWillUnmount: function () {
-          api.componentWillMount.onNext();  
-        },
         shouldComponentUpdate: shouldComponentUpdate,
         
         render: function() {
-            return render(this.props, this.state, api);
+            var state = this.setState.bind(this);
+            state.value = this.state || {};
+            return render(this.props || {}, state);
         }
     });
     return component;

@@ -80,13 +80,12 @@ var MainView = React.createClass({
         if (this.state.activeTodoCount || this.state.completedCount) {
             footer = <TodoFooter count={this.state.activeTodoCount}
                                  completedCount={this.state.completedCount} 
-                                 nowShowing={this.state.currentRoute}
-                                 />
+                                 nowShowing={this.state.currentRoute} />;
         }
         
         var list;
         if (this.state.shownTodos && this.state.shownTodos.length) {
-            list = <TodoList todos={this.state.shownTodos} activeTodoCount={this.state.activeTodoCount} />
+            list = <TodoList todos={this.state.shownTodos} activeTodoCount={this.state.activeTodoCount} />;
         }
         
         return (

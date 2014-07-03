@@ -7,51 +7,41 @@
 'use strict';
 
 var React           = require('react/addons'),
-    EventHandler = require('../utils/eventHandler'),
+    EventHandler    = require('../utils/eventHandler'),
     TodoActions     = require('../actions/TodoActions'),
-    TodoItem        = require('./todoItem.jsx');
+    TodoItem        = require('./todoItem.jsx'),
+    createComponent = require('../utils/createComponent');
 
-
-var TodoList = React.createClass({
-    componentWillMount: function () {
-        var toggleAllChange = EventHandler.create();
-        toggleAllChange
-            .map(function (event) {
-                return event.target.checked;
-            })
-            .subscribe(TodoActions.toggleAll);
+var toggleAllChange = EventHandler.create();
+toggleAllChange
+    .map(function (event) {
+        return event.target.checked;
+    })
+    .subscribe(TodoActions.toggleAll);
         
-        this.handlers = {
-            toggleAllChange: toggleAllChange
-        }
-    },
-    
-    
-
-    render: function () {
-        var todoItems = this.props.todos.map(function (todo) {
-            return (
-                <TodoItem
-                    key={todo.id}
-                    todo={todo}
-                />
-            );
-        }, this);
-        
+var TodoList = createComponent(function (props) {
+    var todoItems = props.todos.map(function (todo) {
         return (
-            <section id="main">
-                <input
-                    id="toggle-all"
-                    type="checkbox"
-                    checked={this.props.activeTodoCount === 0}
-                    onChange={this.handlers.toggleAllChange}
-                />
-                <ul id="todo-list">
-                    {todoItems}
-                </ul>
-            </section>
+            <TodoItem
+                key={todo.id}
+                todo={todo}
+            />
         );
-    }
+    }, this);
+
+    return (
+        <section id="main">
+            <input
+                id="toggle-all"
+                type="checkbox"
+                checked={props.activeTodoCount === 0}
+                onChange={toggleAllChange}
+            />
+            <ul id="todo-list">
+                {todoItems}
+            </ul>
+        </section>
+    );
 });
 
 module.exports = TodoList;

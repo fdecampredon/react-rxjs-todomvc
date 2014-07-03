@@ -1,45 +1,41 @@
 /**
  * @jsx React.DOM
  */
-/*jshint node:true*/
+/*jshint node:true, unused: true, newcap: false*/
 
 'use strict';
 
 var React           = require('react/addons'),
     EventHandler    = require('../utils/eventHandler'),
     TodoActions     = require('../actions/TodoActions'),
-    createComp      = require('../utils/createComp');
+    createComponent = require('../utils/createComponent'),
+    TodoInput       = require('./todoInput.jsx');
 
-var ESCAPE_KEY = 27;
-var ENTER_KEY = 13;
 
 var cx = React.addons.classSet;
 
-module.exports = createComp(
-    {
-        editing: false,
-        editText: null
-    },
-    function (props, state, api) {
-        
-        function submit () {
-            var val = state.editText.trim();
-            if (val) {
+module.exports = createComponent(function (props, state) {
+
+        var todo = props.todo;
+        var getTodo = function () { return todo; };
+    
+        var editing = state.value.editing || false;
+    
+        function submit (text) {
+            if (text) {
                 TodoActions.updateTitle.onNext({
-                    text: val,
+                    text: text,
                     todo: props.todo
                 });
-                api.setState({
-                    editText: val, 
-                    editing: false
-                });
+                state({ editing: false });
             } else {
                 TodoActions.destroy.onNext(props.todo);
             }
         }
-
-        var todo = props.todo;
-        var getTodo = function () { return todo; };
+    
+        function cancel () {
+            state({editing: false});
+        }
 
         var toggleClick = EventHandler.create();
         toggleClick
@@ -56,43 +52,26 @@ module.exports = createComp(
             .map(function () { 
                 return { editing: true };
             })
-            .subscribe(api.setState);
+            .subscribe(state);
 
-        var editFieldKeyDown = EventHandler.create();
-        editFieldKeyDown
-            .filter(function (event) {
-                return event.keyCode === ESCAPE_KEY;
-            })
-            .map(function () {
-                return {
-                    editing: false,
-                    editText: props.todo.title
-                };
-            })
-            .subscribe(api.setState);
-
-        editFieldKeyDown
-            .filter(function (event) {
-                return event.keyCode === ENTER_KEY;
-            })
-            .subscribe(submit);
-
-        var editFieldBlur  = EventHandler.create();
-        editFieldBlur
-            .subscribe(submit);
-
-        var editFieldChange = EventHandler.create();
-        editFieldChange
-            .map(function (e) {
-                return {
-                    editText: e.target.value
-                };
-            });
+        var input;
+        if (editing) {
+            input = (
+                <TodoInput
+                    className="edit"
+                    onSave={submit}
+                    onCancel={cancel}
+                    value={todo.title}
+                    autoFocus={true}
+                />
+            );
+        }
+        
 
         return (
             <li className={cx({
-                completed: props.todo.completed,
-                editing: state.editing
+                completed: todo.completed,
+                editing: editing
             })}>
                 <div className="view">
                     <input
@@ -106,15 +85,7 @@ module.exports = createComp(
                     </label>
                     <button ref="destroyButton" className="destroy" onClick={destroyButtonClick} />
                 </div>
-                <input
-                    ref="editField"
-                    className="edit"
-                    onKeyDown={editFieldKeyDown}
-                    onBlur={editFieldBlur}
-                    value={state.editText}
-                    onChange={editFieldChange}
-                    autoFocus={true}
-                />
+                {input}
             </li>
         );
     }

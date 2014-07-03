@@ -8,7 +8,7 @@
 var React           = require('react/addons'),
     EventHandler    = require('../utils/eventHandler'),
     TodoActions     = require('../actions/todoActions'),
-    createComp      = require('../utils/createComp');
+    createComponent = require('../utils/createComponent');
 
 var ENTER_KEY = 13;
 
@@ -36,7 +36,7 @@ enterEvent
     });
 
 
-module.exports = createComp(function () {
+module.exports = createComponent(function () {
     return (
         <header id="header">
             <h1>todos</h1>

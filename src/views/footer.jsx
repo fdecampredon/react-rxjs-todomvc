@@ -6,17 +6,17 @@
 'use strict';
 
 
-var React       = require('react/addons'),
-    pluralize   = require('../utils/pluralize'),
-    EventHandler = require('../utils/eventHandler'),
-    routes      = require('../routes'),
-    TodoActions = require('../actions/TodoActions'),
-    createComp  = require('../utils/createComp');
+var React           = require('react/addons'),
+    pluralize       = require('../utils/pluralize'),
+    EventHandler    = require('../utils/eventHandler'),
+    routes          = require('../routes'),
+    TodoActions     = require('../actions/TodoActions'),
+    createComponent = require('../utils/createComponent');
 
 var clearButtonClick = EventHandler.create();
 clearButtonClick.subscribe(TodoActions.clearCompleted);
 
-module.exports = createComp(function (props) {
+module.exports = createComponent(function (props) {
     var activeTodoWord = pluralize(props.count, 'item');
     var clearButton = null;
     if (props.completedCount > 0) {
