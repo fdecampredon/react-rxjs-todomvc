@@ -28,7 +28,7 @@ This store exposes 2 streams:
 
 ## The TodoActions: 
 
-A list of Rx Observer that will be exposed to our components, this actions are registred against the `updates` stream of the TodoStore, and will push new operations into this stream when they receive values.
+A list of Rx Observer that will be exposed to our components, this actions are registered against the `updates` stream of the TodoStore, and will push new operations into this stream when they receive values.
 
 ## The Views:
 
