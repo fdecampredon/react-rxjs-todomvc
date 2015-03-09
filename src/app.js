@@ -3,7 +3,7 @@
 var Rx          = require('rx'),
     React       = require('react/addons'),
     TodoStore   = require('./store/todoStore'),
-    TodoActions = require('./actions/todoActions'),
+    TodoActions = require('./actions/TodoActions'),
     MainView    = require('./views/mainView.jsx');
 
 

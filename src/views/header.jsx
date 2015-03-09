@@ -7,7 +7,7 @@
 
 var React           = require('react/addons'),
     EventHandler    = require('../utils/eventHandler'),
-    TodoActions     = require('../actions/todoActions');
+    TodoActions     = require('../actions/TodoActions');
 
 var ENTER_KEY = 13;
 
