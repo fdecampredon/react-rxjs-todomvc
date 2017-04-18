@@ -14,7 +14,7 @@ npm install
 ```
 this will install all the dependencies and bundle the project sources files.
 
-#Implementation
+# Implementation
 
 This implementation has been inspired by the [React Flux architecture](https://github.com/facebook/react/tree/master/examples/todomvc-flux)
 
